@@ -20,7 +20,7 @@ namespace FileService.Controllers
     public class MainController : ControllerBase
     {
         private static readonly List<StoredFileInfo> Files = new List<StoredFileInfo>();
-        private readonly long _fileSizeLimit;
+        private readonly long _fileSizeLimit = 10000;
         private readonly string[] _permittedExtensions =
         {
             "txt"
@@ -84,15 +84,16 @@ namespace FileService.Controllers
                             file.IsPrimary = isPrimary;
                         }
                     }
-                    section = await reader.ReadNextSectionAsync();
+                    
                 }
-                Files.Add(file);
-
-                return Created(nameof(MainController), file);
+                section = await reader.ReadNextSectionAsync();
             }
 
-            return null;
+            Files.Add(file);
+            return Created(nameof(MainController), file);
         }
+
+        [HttpHead("{id}")]
         [HttpGet("{id}")]
         public async Task<IActionResult> DownloadFile([FromRoute]string id)
         {
@@ -131,11 +132,6 @@ namespace FileService.Controllers
             {
                 return BadRequest($"File with GUID={id} Not Found.");
             }
-        }
-        [HttpHead]
-        public string GetInformation()
-        {
-            return "Info";
         }
         private static string GetMimeTypes(string ext)
         {
