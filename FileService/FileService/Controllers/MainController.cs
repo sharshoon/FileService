@@ -48,7 +48,16 @@ namespace FileService.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteFile([FromRoute]string id)
         {
-            
+            var file = Files.FirstOrDefault(p => p.Id == id);
+            if (file != null)
+            {
+                System.IO.File.Delete(file.FilePath);
+                return Ok();
+            }
+            else
+            {
+                return BadRequest($"File with GUID={id} Not Found.");
+            }
         }
         [HttpHead]
         public string GetInformation()
